@@ -1,5 +1,5 @@
 require "observ/version"
-module Observ
+module ObServ
   module DSL
     def subscribe(event, on: :receive)
       return ObServ.register self, event, on: on, &Proc.new if block_given?
