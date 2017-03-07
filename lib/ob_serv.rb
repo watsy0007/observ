@@ -1,4 +1,4 @@
-require "observ/version"
+require "ob_serv/version"
 module ObServ
   module DSL
     def subscribe(event, on: :receive)

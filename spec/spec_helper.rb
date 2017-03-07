@@ -1,5 +1,5 @@
 require "bundler/setup"
-require "observ"
+require "ob_serv"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
