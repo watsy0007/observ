@@ -1,9 +1,10 @@
 require "ob_serv/version"
 module ObServ
   module DSL
-    def subscribe(event, on: :receive)
-      return ObServ.register self, event, on: on, &Proc.new if block_given?
-      ObServ.register self, event, on: on
+    def subscribe(event, options = {})
+      options[:on] = event unless options.include?(:on)
+      return ObServ.register self, event, options, &Proc.new if block_given?
+      ObServ.register self, event, options
     end
 
     def publish(event, *args)
@@ -21,21 +22,21 @@ module ObServ
     }
   end
 
-  def register(obj, event, on: :receive)
+  def register(obj, event, options = {})
     @notifies ||= {}
     block = block_given? ? Proc.new : nil
     @notifies[event] ||= {}
-    @notifies[event][obj.__id__] = [obj, on, block]
+    @notifies[event][obj.__id__] = [obj, options, block]
   end
 
   def publish(event, *args)
-    @notifies[event]&.each do |_, (obj, m, blk)|
+    @notifies[event]&.each do |_, (obj, opts, blk)|
       next blk.call(*args) if blk
+      m = opts[:on]
       if obj.respond_to?(m) && obj.respond_to?(:name) && obj.to_s == obj.name
         next obj.send m, *args if obj.respond_to? m
       end
       obj.send m, *args if obj.respond_to? m
-      obj.send event, *args if obj.respond_to? event
     end
   end
 end
